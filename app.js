@@ -43,8 +43,6 @@ app.use((req, res, next) => {
   res.locals.user = req.user // passport done(null, user) 傳出來的使用者
   res.locals.success_msg = req.flash('success_msg') // 設定 flash success msg
   res.locals.warning_msg = req.flash('warning_msg') // 設定 flash warning msg
-  console.log('success_msg', res.locals.success_msg)
-  console.log('warning_msg', res.locals.warning_msg)
   next()
 })
 

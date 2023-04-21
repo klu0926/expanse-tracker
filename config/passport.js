@@ -42,36 +42,37 @@ module.exports = (app) => {
   // 2 strategy : facebook
   // ...
 
+
+  // 3 serializeUser (user => id)
+  // 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回user.id
+  passport.serializeUser((user, done) => {
+    try {
+      return done(null, user.id)
+    } catch (err) {
+      return done(err, null)
+    }
+  })
+
+  // 4 deserializeUser ( id => user)
+  // 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回 user
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await User.findById(id).lean()
+
+      if (user) {
+        return done(null, user)
+      } else {
+        throw new Error('Can not find user')
+      }
+
+    } catch (err) {
+      console.log(err)
+      return done(err, null)
+    }
+  })
+
 }
 
 
-// 3 serializeUser (user => id)
-// 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回user.id
-passport.serializeUser((user, done) => {
-  try {
-    return done(null, user.id)
-  } catch (err) {
-    return done(err, null)
-  }
-})
 
-// 4 deserializeUser ( id => user)
-// 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回 user
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id).lean()
 
-    if (user) {
-      return done(null, user)
-    } else {
-      throw new Error('Can not find user')
-    }
-
-  } catch (err) {
-    console.log(err)
-    return done(err, null)
-  }
-})
-
-// done() 回傳回去的err, 可以在 passport.authentication {option} 裡面使用 failureFlash: true 來使用
-// 之後可以用 req.flash('error') 在下一個 req-res cycle 裡面取得，取得後就會被刪除。

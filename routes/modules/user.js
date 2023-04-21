@@ -2,14 +2,15 @@ const router = require('express').Router()
 const passport = require('passport')
 const User = require('../../models/User')
 const bcrypt = require('bcryptjs')
+const { isNotAuthenticated } = require('../../middleware/auth')
 
 
-// Login GET
-router.get('/login', (req, res) => {
+// 登入 GET
+router.get('/login', isNotAuthenticated, (req, res) => {
   res.render('login')
 })
 
-// Login POST
+// 登入 POST
 router.post('/login', (req, res, next) => {
   const { email, password } = req.body
   if (!email || !password) {
@@ -23,12 +24,12 @@ router.post('/login', (req, res, next) => {
 }))
 
 
-// Register GET
-router.get('/register', (req, res) => {
+// 註冊 GET
+router.get('/register', isNotAuthenticated, (req, res) => {
   res.render('register')
 })
 
-// Register POST
+// 註冊 POST
 router.post('/register', async (req, res, next) => {
 
   let { name, email, password, confirmPassword } = req.body
@@ -71,15 +72,21 @@ router.post('/register', async (req, res, next) => {
     const hash = await bcrypt.hash(password, salt)
 
     // 做使用者資料
-    await User.create({
+    const newUser = await User.create({
       name,
       email,
       password: hash
     })
-    // 做好後去驗證
-    req.flash('success_msg', '註冊成功！')
-    next()
+
+    // 使用新創的使用者 登入
+    req.logIn(newUser, (err) => {
+      if (err) return next(err)
+      req.flash('success_msg', '註冊成功！')
+      return res.redirect('/records')
+    })
+
   }
+  // 抓問題
   catch (err) {
     console.log(err)
     res.locals.warning_msg = '出現預期外的問題，請在嘗試一次'
@@ -88,9 +95,18 @@ router.post('/register', async (req, res, next) => {
       email,
     })
   }
-}, passport.authenticate('local', {
-  successRedirect: '/records',
-  failureRedirect: '/user/login',
-}))
+})
+
+
+// 登出
+router.post('/logout', (req, res) => {
+  req.logOut(error => {
+    if (error) {
+      return next(error)
+    }
+    req.flash('success_msg', '成功登出！')
+    res.redirect('/user/login')
+  })
+})
 
 module.exports = router
