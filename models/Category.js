@@ -4,7 +4,11 @@ const Schema = mongoose.Schema
 const categorySchema = new Schema({
   name: {
     type: String,
-    require: true,
+    required: true,
+  },
+  icon: {
+    type: String,
+    required: true
   }
 })
 

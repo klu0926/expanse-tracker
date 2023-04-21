@@ -4,17 +4,17 @@ const Schema = mongoose.Schema
 const recordSchema = new Schema({
   name: {
     type: String,
-    require: true,
+    required: true,
   },
   date: {
     type: Date,
-    require: true,
+    required: true,
     default: Date.now,
   },
   amount: {
     type: Number,
     require: true,
-    default: 0
+    defaultd: 0
   },
   userId: {
     type: Schema.Types.ObjectId,
