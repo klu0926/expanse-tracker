@@ -1,5 +1,6 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
+const FacebookStrategy = require('passport-facebook')
 const User = require('../models/User')
 const bcrypt = require('bcryptjs')
 
@@ -40,39 +41,64 @@ module.exports = (app) => {
   )
 
   // 2 strategy : facebook
-  // ...
+  passport.use(new FacebookStrategy({
 
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: process.env.FACEBOOK_APP_CALLBACK,
+    profileFields: ['email', 'displayName']
 
-  // 3 serializeUser (user => id)
-  // 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回user.id
-  passport.serializeUser((user, done) => {
-    try {
-      return done(null, user.id)
-    } catch (err) {
-      return done(err, null)
-    }
-  })
+  }, (accessToken, refreshToken, profile, done) => {
+    // 使用fb在callback回傳來的資料
+    const { name, email } = profile._json
 
-  // 4 deserializeUser ( id => user)
-  // 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回 user
-  passport.deserializeUser(async (id, done) => {
-    try {
-      const user = await User.findById(id).lean()
+    // 找使用者
+    User.findOne({ email })
+      .then(user => {
+        // 找到使用者就登入成功，回傳使用者到req.user
+        if (user) return done(null, user)
 
-      if (user) {
-        return done(null, user)
-      } else {
-        throw new Error('Can not find user')
-      }
-
-    } catch (err) {
-      console.log(err)
-      return done(err, null)
-    }
-  })
-
+        // 找不到使用者就做一個使用者資料
+        // 先做一個密碼
+        const randomPassword = Math.random().toString(36).slice(-8)
+        bcrypt
+          .genSalt(10)
+          .then(salt => bcrypt.hash(randomPassword, salt))
+          .then(hash => User.create({
+            name,
+            email,
+            password: hash
+          }))
+          .then(user => done(null, user))
+          .catch(err => done(err, false))
+      })
+  }))
 }
 
+// 3 serializeUser (user => id)
+// 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回user.id
+passport.serializeUser((user, done) => {
+  try {
+    return done(null, user.id)
+  } catch (err) {
+    return done(err, null)
+  }
+})
 
+// 4 deserializeUser ( id => user)
+// 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回 user
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id).lean()
+    if (user) {
+      return done(null, user)
+    } else {
+      throw new Error('Can not find user')
+    }
+  } catch (err) {
+    console.log(err)
+    return done(err, null)
+  }
+})
 
 
