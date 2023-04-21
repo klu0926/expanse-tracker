@@ -1,3 +1,5 @@
+const mongoose = require('mongoose')
+
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
   console.log('dot env required')
@@ -13,7 +15,10 @@ db.once('open', async () => {
   try {
     await Category.create(categoryData)
     console.log('categorySeeder is all done!')
+
     process.exit()
+    // Close the Mongoose connection explicitly
+    //await mongoose.disconnect();
 
   } catch (error) {
     console.log(error)

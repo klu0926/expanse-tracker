@@ -4,6 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "deleteAllData": "node models/seeds/deleteAllData.js",
+    "seed": "node models/seeds/categorySeeder.js && node models/seeds/recordSeeder.js",
     "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
