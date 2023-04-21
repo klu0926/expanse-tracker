@@ -1,9 +1,10 @@
-// env
-if (process.env.DOT_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
+  console.log('dot env required')
 }
 
 // node modules
+require('./config/mongoose')
 const express = require('express')
 const exphbs = require('express-handlebars')
 
@@ -12,7 +13,7 @@ const routes = require('./routes')
 
 // app
 const app = express()
-const PORT = process.env.PORT
+const PORT = 3000
 
 // app engine
 app.engine('hbs', exphbs({

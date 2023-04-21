@@ -14,15 +14,16 @@
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "express": "4.18",
-    "express-handlebars": "4.0",
+    "express-handlebars": "^4.0.4",
     "express-session": "^1.17.3",
     "method-override": "^3.0.0",
-    "mongoose": "^5.9.7",
+    "mongoose": "^5.13.17",
     "passport": "^0.6.0",
     "passport-facebook": "^3.0.0",
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
+    "detective": "^5.2.1",
     "dotenv": "^16.0.3"
   }
 }
