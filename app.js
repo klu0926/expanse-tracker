@@ -22,6 +22,9 @@ app.engine('hbs', exphbs({
 }))
 app.set('view engine', 'hbs')
 
+// app use middleware
+app.use(express.static('public'))
+
 // routes
 app.use(routes)
 
