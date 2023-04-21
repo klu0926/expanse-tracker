@@ -1,0 +1,29 @@
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <div class="card card-body">
+      <!-- title -->
+      <h1 class="text-center mt-3">登入帳號</h1>
+      {{> message}}
+      <!-- form -->
+      <form action="/user/login" method="POST">
+        <div class="mb-3">
+          <label class="mb-2" for="email">信箱</label>
+          <input class="form-control" type="email" name="email" id="email" placeholder="Enter Email" {{#if email}}
+            value='{{email}}' {{/if}}>
+        </div>
+        <div class="mb-3">
+          <label class="mb-2" for="password">密碼</label>
+          <input class="form-control" type="password" name="password" id="password" placeholder="Enter Password">
+        </div>
+        <div class="row g-2">
+          <button class="btn btn-primary" type="submit">登入</button>
+          <a href="/auth/facebook" class="btn btn-info">臉書登入</a>
+        </div>
+      </form>
+      <p class="lead mt-4">
+        還沒有帳號嗎?<a href="/user/register">註冊帳號</a>
+      </p>
+
+    </div>
+  </div>
+</div>
