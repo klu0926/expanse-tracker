@@ -3,15 +3,57 @@ const Record = require('../../models/Record')
 const Category = require('../../models/Category')
 
 
-// Create
+// Create Page
+router.get('/new', async (req, res) => {
+  const categories = await Category.find({}).lean()
+  res.render('new', { categories })
+})
 
-// Read all
+// Create Post
+router.post('/new', async (req, res) => {
+
+  const { name, date, category, amount } = req.body
+  const categories = await Category.find({}).lean()
+
+  // input guard
+  if (!name || !date || !category || !amount) {
+    res.locals.warning_msg = '每個項目都是必須填的唷。'
+    return res.render('new', {
+      name,
+      date,
+      category,
+      amount,
+      categories
+    })
+  }
+
+  // 取得 user id
+  const userId = req.user._id
+
+  // 取得 categories id
+  const referenceCategory = categories.find(cate => cate.name === category)
+  const categoryId = referenceCategory._id
+
+  // 做資料
+  await Record.create({
+    name,
+    date,
+    amount,
+    userId,
+    categoryId
+  })
+  // 做完後回去 records
+  req.flash('success_msg', '新增一筆資料')
+  res.redirect('/records')
+})
+
+
+// Read all 
 router.get('/', async (req, res) => {
   // 使用user Id (由passport 提供)
   const userId = req.user._id
 
   try {
-
     // 使用者 records
     const records = await Record.find({ userId }).lean().sort({ _id: 'asc' })
 
@@ -27,25 +69,23 @@ router.get('/', async (req, res) => {
     // 獲得 category
     const categories = await Category.find({}).lean()
 
+    // 處理每一筆records
     records.map((record) => {
-
-      //---------總金額----------
+      //--------加入總金額----------
       totalAmount += record.amount
 
-
-      //--------類型 icon---------
+      //--------獲得 類型icon---------
       // 使用 equals() 來比較 mongoose ObjectId
       const matchCate = categories.find(cate => {
         return record.categoryId.toString() === cate._id.toString()
       })
 
-
       // 紀錄 icon 到每一個record 裡面
       if (matchCate) {
-        record.icon = matchCate.icon
+        record.iconLink = matchCate.icon
       }
       // 做出 font awesome icon
-      const rawIcon = record.icon.split('/').slice(-1)[0].split('?')
+      const rawIcon = record.iconLink.split('/').slice(-1)[0].split('?')
       const iconShape = rawIcon[0]
       const iconClass = rawIcon[1].split('=')[1]
 
@@ -68,8 +108,11 @@ router.get('/', async (req, res) => {
       record.localDateString = localDateString
     })
 
+    // 轉換成台幣，並拿掉小數點
+    const totalAmountString = totalAmount.toLocaleString('zh-TW', { style: 'currency', currency: 'TWD' }).split('.')[0];
+
     // 回傳 records
-    res.render('index', { records, totalAmount, categories })
+    res.render('index', { records, totalAmountString, categories })
 
 
   } catch (error) {
@@ -81,7 +124,10 @@ router.get('/', async (req, res) => {
 })
 
 // Read One
+
 // Update 
+
+
 // Delete
 
 module.exports = router

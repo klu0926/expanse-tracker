@@ -19,7 +19,6 @@
         <option value="">選擇帳目類型</option>
         {{#each categories}}
         <option value="{{this.name}}">
-          <i class="{{this.fontAwesomeClass}}">{{this.fontAwesomeClass}}</i>
           {{this.name}}
         </option>
         {{/each}}
@@ -30,7 +29,7 @@
       <p class="lead">總金額</p>
     </div>
     <div class="d-flex justify-content-center">
-      <h1 class="display-1 text-info">{{totalAmount}}</h1>
+      <h1 class="display-1 text-info">{{totalAmountString}}</h1>
     </div>
 
     <!-- 新增按鈕 -->
