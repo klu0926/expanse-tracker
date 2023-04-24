@@ -97,7 +97,6 @@ router.post('/register', async (req, res, next) => {
   }
 })
 
-
 // 登出
 router.post('/logout', (req, res) => {
   req.logOut(error => {

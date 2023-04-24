@@ -129,5 +129,23 @@ router.get('/', async (req, res) => {
 
 
 // Delete
+router.delete('/:id', async (req, res) => {
+  const id = req.params.id
+  console.log(id)
+
+  try {
+    const record = await Record.findById(id)
+    if (record) {
+      await record.deleteOne()
+    }
+    return res.redirect('/records')
+
+  } catch (err) {
+    console.log(err)
+    req.flash('warning_msg', '刪除資料出現預期外的問題，請您再嘗試一次。')
+    redirect('/records')
+  }
+
+})
 
 module.exports = router
