@@ -31,7 +31,7 @@ app.set('view engine', 'hbs')
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
 }))
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
@@ -41,12 +41,8 @@ app.use(flash())
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.isAuthenticated() // passport 可以偵測是否已經驗證過
   res.locals.user = req.user // passport done(null, user) 傳出來的使用者
-  if (req.flash('success_msg')) {
-    res.locals.success_msg = req.flash('success_msg')
-  }
-  if (req.flash('warning_msg')) {
-    res.locals.warning_msg = req.flash('warning_msg')
-  }
+  res.locals.success_msg = req.flash('success_msg')
+  res.locals.warning_msg = req.flash('warning_msg')
   next()
 })
 
