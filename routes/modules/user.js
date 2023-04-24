@@ -104,6 +104,7 @@ router.post('/logout', (req, res) => {
       return next(error)
     }
     req.flash('success_msg', '成功登出！')
+    res.redirect('/user/login')
   })
 })
 
