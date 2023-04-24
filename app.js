@@ -41,8 +41,12 @@ app.use(flash())
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.isAuthenticated() // passport 可以偵測是否已經驗證過
   res.locals.user = req.user // passport done(null, user) 傳出來的使用者
-  res.locals.success_msg = req.flash('success_msg') // 設定 flash success msg
-  res.locals.warning_msg = req.flash('warning_msg') // 設定 flash warning msg
+  if (req.flash('success_msg')) {
+    res.locals.success_msg = req.flash('success_msg')
+  }
+  if (req.flash('warning_msg')) {
+    res.locals.warning_msg = req.flash('warning_msg')
+  }
   next()
 })
 

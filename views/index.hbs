@@ -1,9 +1,85 @@
 <div class="row mt-5">
-  <div class="col-md-6 mx-auto">
+  <div class="col-md-7 col-sm-8  mx-auto">
     {{>message}}
-    <p>你好{{user.name}}</p>
-    <h1>index page</h1>
+
+    {{#if noRecords}}
+    <h1 class="mt-5"> 您目前沒有任何帳目唷。</h1>
+
+    <!-- 新增按鈕 -->
+    <div class="d-flex justify-content-start">
+      <p>嘗試新增你的第一筆帳目吧！</p>
+      <a href="/records/new" class="btn btn-primary mb-3">新增</a>
+    </div>
+
+    {{else}}
+    <!-- 類型 -->
+    <div class="input-group mb-3">
+      <label class="input-group-text" for="category">類型</label>
+      <select class="form-control" id="category" name="category" id="category">
+        <option value="">選擇帳目類型</option>
+        {{#each categories}}
+        <option value="{{this.name}}">
+          <i class="{{this.fontAwesomeClass}}">{{this.fontAwesomeClass}}</i>
+          {{this.name}}
+        </option>
+        {{/each}}
+      </select>
+    </div>
+    <!-- totalAmount -->
+    <div class="d-flex justify-content-center">
+      <p class="lead">總金額</p>
+    </div>
+    <div class="d-flex justify-content-center">
+      <h1 class="display-1 text-info">{{totalAmount}}</h1>
+    </div>
+
+    <!-- 新增按鈕 -->
+    <div class="d-flex justify-content-end">
+      <a href="/records/new" class="btn btn-primary mb-3">新增</a>
+    </div>
+
+    <!-- 項目list -->
+    <ul class="list-group ">
+      <li class="list-group-item">
+        <div class="row row-cols-5">
+          <span>類別</span>
+          <span>項目</span>
+          <span>日期</span>
+          <span>金額</span>
+          <span>操作</span>
+        </div>
+      </li>
+      {{#each records}}
+      <li class="list-group-item">
+        <div class="row row-cols-5">
+
+          <!--類別icon-->
+          <span><i class="{{this.fontAwesomeClass}} h5"></i></span>
+          <!--項目-->
+          <span class="d-inline h5">
+            {{ this.name }}
+          </span>
+          <!--日期-->
+          <span class="lead">{{this.localDateString}}</span>
+          <!--金額-->
+          <span class="h4 text-info">{{this.amount}}</span>
+          <!--操作-->
+          <div class="col-auto">
+            <a class="btn btn-success" href="/records/{{ this._id }}/edit">edit</a>
+            <form action="/records/{{ this._id }}?_method=DELETE" method="POST" style="display: inline;">
+              <button class="btn btn-danger" type="submit">delete</button>
+            </form>
+          </div>
+        </div>
+      </li>
+      {{/each}}
+    </ul>
+
+
+    {{/if}}
+
+    <img src="https://fontawesome.com/icons/shuttle-van?style=solid" alt="" srcset="">
+
 
   </div>
-
 </div>

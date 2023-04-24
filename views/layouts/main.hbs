@@ -20,12 +20,13 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">廣志の私帳</a>
       {{#if isAuthenticated}}
+      <a class="navbar-brand" href="/">{{user.name}}の私帳</a>
       <form action="/user/logout" method="POST">
         <button href="/user/logout" class="btn btn-info my-2 my-sm-0 px-3"><span class="">登出</span></button>
       </form>
       {{else}}
+      <a class="navbar-brand" href="/">我の私帳</a>
       <a href="/user/login" class="btn btn-info my-2 my-sm-0 px-3"><span class="">登入</span></a>
       {{/if}}
     </div>

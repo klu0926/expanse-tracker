@@ -3,6 +3,7 @@ const LocalStrategy = require('passport-local')
 const FacebookStrategy = require('passport-facebook')
 const User = require('../models/User')
 const bcrypt = require('bcryptjs')
+const { disconnect } = require('mongoose')
 
 module.exports = (app) => {
 
@@ -78,27 +79,25 @@ module.exports = (app) => {
 // 3 serializeUser (user => id)
 // 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回user.id
 passport.serializeUser((user, done) => {
-  try {
-    return done(null, user.id)
-  } catch (err) {
-    return done(err, null)
-  }
+  return done(null, user.id)
 })
 
 // 4 deserializeUser ( id => user)
 // 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回 user
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id).lean()
-    if (user) {
-      return done(null, user)
-    } else {
-      throw new Error('Can not find user')
-    }
-  } catch (err) {
-    console.log(err)
-    return done(err, null)
-  }
+passport.deserializeUser((id, done) => {
+
+  User.findById(id)
+    .lean()
+    .then(user => {
+      if (user) {
+        return done(null, user)
+      }
+      return new Error('Can not find user')
+    })
+    .catch(error => {
+      console.log(error)
+      return done(error, null)
+    })
 })
 
 
