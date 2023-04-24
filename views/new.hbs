@@ -23,13 +23,22 @@
           <label class="mb-2" for="category">類型</label>
           <select class="form-control" id="category" name="category" id="category">
             <option value="">選擇類型</option>
-            {{#each categories}}
-            <option value="{{this.name}}">
-              {{this.name}}
-            </option>
-            {{/each}}
+            <!-- 有選 category-->
             {{#if category}}
-            <option value="{{category}}" selected>{{category}}</option>
+            {{#each categories}}
+            {{#with ../category}}
+            {{#isSame ../this.name .}}
+            <option value="{{../../this.name}}" selected>{{../../this.name}}</option>
+            {{else}}
+            <option value="{{../../this.name}}">{{../../this.name}}</option>
+            {{/isSame}}
+            {{/with}}
+            {{/each}}
+            <!-- 沒選 category-->
+            {{else}}
+            {{#each categories}}
+            <option value="{{this.name}}">{{this.name}}</option>
+            {{/each}}
             {{/if}}
           </select>
         </div>
