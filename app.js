@@ -14,6 +14,7 @@ const flash = require('connect-flash')
 
 // my modules
 const routes = require('./routes')
+const myHelpers = require('./config/helpers')
 
 // app
 const app = express()
@@ -23,7 +24,7 @@ const PORT = 3000
 app.engine('hbs', exphbs({
   defaultLayout: 'main',
   extname: '.hbs',
-  helpers: null
+  helpers: myHelpers
 }))
 app.set('view engine', 'hbs')
 

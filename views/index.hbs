@@ -13,17 +13,35 @@
 
     {{else}}
     <!-- 類型 -->
-    <div class="input-group mb-3">
-      <label class="input-group-text" for="category">類型</label>
-      <select class="form-control" id="category" name="category" id="category">
-        <option value="">選擇帳目類型</option>
-        {{#each categories}}
-        <option value="{{this.name}}">
-          {{this.name}}
-        </option>
-        {{/each}}
-      </select>
-    </div>
+    <form action="/records" method="get">
+      <div class="input-group mb-3">
+
+        <label class="input-group-text" for="category">帳目類型</label>
+        <select class="form-control" id="category" name="category" id="category" onchange="this.form.submit()">
+          <option value="">全部</option>
+
+          <!--有 selectCategory -->
+          {{#if selectedCategory }}
+          {{#each categories}}
+          {{#with ../selectedCategory}}
+          {{#isSame ../this.name .}}
+          <option value="{{../../this.name}}" selected>{{../../this.name}}</option>
+          {{else}}
+          <option value="{{../../this.name}}">{{../../this.name}}</option>
+          {{/isSame}}
+          {{/with}}
+          {{/each}}
+
+          <!--沒有 selectCategory -->
+          {{else}}
+          {{#each categories}}
+          <option value="{{this.name}}">{{this.name}}</option>
+          {{/each}}
+          {{/if}}
+        </select>
+      </div>
+    </form>
+
     <!-- totalAmount -->
     <div class="d-flex justify-content-center">
       <p class="lead">總金額</p>

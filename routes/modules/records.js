@@ -47,20 +47,38 @@ router.post('/new', async (req, res) => {
 })
 
 
+
 // Read all 
 router.get('/', async (req, res) => {
-  // 使用user Id (由passport 提供)
-  const userId = req.user._id
 
   try {
-    // 使用者 records
-    const records = await Record.find({ userId }).lean().sort({ _id: 'asc' })
+    // 使用user Id (由passport 提供)
+    const userId = req.user._id
+
+    // All records
+    let records = await Record.find({ userId }).lean().sort({ _id: 'asc' })
 
     // 沒有 records
     if (records.length === 0) {
       let noRecords = true
       return res.render('index', { noRecords: true })
     }
+
+    // 指定類型
+    const selectedCategory = req.query.category
+    if (selectedCategory) {
+      const category = await Category.findOne({ name: selectedCategory })
+      const categoryId = category._id
+      // 找出符合類型的record
+      records = records.filter(record => record.categoryId.equals(categoryId))
+    }
+
+    // 使用者 records (全部類型)
+    else {
+      records = await Record.find({ userId }).lean().sort({ _id: 'asc' })
+    }
+
+
 
     // 總金額
     let totalAmount = 0
@@ -74,7 +92,7 @@ router.get('/', async (req, res) => {
       totalAmount += record.amount
 
       //--------獲得 類型icon---------
-      // 使用 equals() 來比較 mongoose ObjectId
+      // 也可以使用 equals() 來比較 mongoose ObjectId
       const matchCate = categories.find(cate => {
         return record.categoryId.toString() === cate._id.toString()
       })
@@ -111,7 +129,12 @@ router.get('/', async (req, res) => {
     const totalAmountString = totalAmount.toLocaleString('zh-TW', { style: 'currency', currency: 'TWD' }).split('.')[0];
 
     // 回傳 records
-    res.render('index', { records, totalAmountString, categories })
+    res.render('index', {
+      records,
+      totalAmountString,
+      categories,
+      selectedCategory,
+    })
 
 
   } catch (error) {
@@ -187,7 +210,6 @@ router.put('/:id', async (req, res) => {
     // update data
     for (const key in updateData) {
       if (key in record) {
-        console.log(key)
         record[key] = updateData[key]
       }
     }
