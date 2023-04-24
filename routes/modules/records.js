@@ -42,8 +42,7 @@ router.post('/new', async (req, res) => {
     userId,
     categoryId
   })
-  // 做完後回去 records
-  req.flash('success_msg', '新增一筆資料')
+  // 做完回去 records
   res.redirect('/records')
 })
 
@@ -125,13 +124,88 @@ router.get('/', async (req, res) => {
 
 // Read One
 
-// Update 
+// Update Page
+router.get('/:id/edit', async (req, res) => {
+  const recordId = req.params.id
+  const record = await Record.findById(recordId).lean()
+
+  // guard for no record
+  if (!record) {
+    req.flash('warning_msg', '出現預期外的問題，請您再嘗試一次。')
+    return res.redirect('/records')
+  }
+
+  // get category
+  const categories = await Category.find({}).lean()
+  const category = categories.find(cate => cate._id.toString() === record.categoryId.toString())
+
+  // convert date to year.month.day formate
+  const date = record.date.toISOString().slice(0, 10)
+
+  res.render('edit', {
+    categories,
+    id: record._id,
+    category: category.name,
+    name: record.name,
+    amount: record.amount,
+    date,
+  })
+})
+
+// Update put
+router.put('/:id', async (req, res) => {
+  const id = req.params.id
+  const updateData = req.body
+  let { name, date, category, amount } = req.body
+
+  try {
+    // get category
+    const categories = await Category.find({}).lean()
+
+    // 檢查必要資料，有少就提示
+    name = name.trim()
+    if (!name || !category || !date || !amount) {
+
+      res.locals.warning_msg = '所有的資料都是必填的唷。'
+      return res.render('edit', {
+        categories,
+        id,
+        category,
+        name,
+        amount,
+        date,
+      })
+    }
+
+    // get record
+    const record = await Record.findById(id)
+
+    // get categoryId
+    const currentCategory = categories.find(cate => cate.name === category)
+    updateData.categoryId = currentCategory._id
+
+    // update data
+    for (const key in updateData) {
+      if (key in record) {
+        console.log(key)
+        record[key] = updateData[key]
+      }
+    }
+    // 存入資料庫 後回去 /records
+    await record.save()
+    res.redirect('/records')
+
+  } catch (error) {
+    console.log(error)
+    req.flash('warning_msg', '刪除資料出現預期外的問題，請您再嘗試一次。')
+    redirect(`/records/${id}/edit`)
+  }
+})
 
 
 // Delete
 router.delete('/:id', async (req, res) => {
   const id = req.params.id
-  console.log(id)
 
   try {
     const record = await Record.findById(id)

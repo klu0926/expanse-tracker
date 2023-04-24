@@ -1,0 +1,49 @@
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <div class="card card-body">
+      <!-- title -->
+      <h1 class="text-center mt-3">修改支出</h1>
+      {{> message}}
+      <!-- form -->
+      <form action="/records/{{id}}?_method=PUT" method="POST">
+
+        <!-- 支出名稱 -->
+        <div class="mb-3">
+          <label class="mb-2" for="name">項目名稱</label>
+          <input class="form-control" name="name" id="name" placeholder="Enter name" {{#if name}} value='{{name}}'
+            {{/if}}>
+        </div>
+        <!-- 日期 -->
+        <div class="mb-3">
+          <label class="mb-2" for="date">日期</label>
+          <input class="form-control" type="date" name="date" id="date" {{#if date}}value="{{date}}" {{/if}}>
+        </div>
+        <!-- 類型 -->
+        <div class="mb-3">
+          <label class="mb-2" for="category">類型</label>
+          <select class="form-control" id="category" name="category" id="category">
+            <option value="">選擇類型</option>
+            {{#each categories}}
+            <option value="{{this.name}}">
+              {{this.name}}
+            </option>
+            {{/each}}
+            {{#if category}}
+            <option value="{{category}}" selected>{{category}}</option>
+            {{/if}}
+          </select>
+        </div>
+        <!-- 金額 -->
+        <div class="mb-3">
+          <label class="mb-2" for="amount">金額</label>
+          <input type="number" min="0" class="form-control" name="amount" id="amount" placeholder="Enter amount" {{#if
+            amount}} value='{{amount}}' {{/if}}>
+        </div>
+        <!--submit-->
+        <button type="submit" class="btn btn-primary mt-3" style="width: 100%;">修改</button>
+
+      </form>
+
+    </div>
+  </div>
+</div>
