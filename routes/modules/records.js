@@ -55,8 +55,22 @@ router.get('/', async (req, res) => {
     // 使用user Id (由passport 提供)
     const userId = req.user._id
 
+    // 整理 sort
+    const sort = req.query.sort || req.session.sort
+    const sortObject = {}
+    // create mongoose sort object key:value (asc / desc)
+    if (sort) {
+      const sortArray = sort.split('-')
+      const key = sortArray[0]
+      const value = sortArray[1]
+      sortObject[key] = value
+    } else {
+      sortObject._id = 'asc'
+    }
+    req.session.sort = sort // 存入session
+
     // All records
-    let records = await Record.find({ userId }).lean().sort({ _id: 'asc' })
+    let records = await Record.find({ userId }).lean().sort(sortObject)
 
     // 沒有 records
     if (records.length === 0) {
@@ -64,21 +78,19 @@ router.get('/', async (req, res) => {
       return res.render('index', { noRecords: true })
     }
 
-    // 指定類型
-    const selectedCategory = req.query.category
+    // 篩選類型
+    let selectedCategory = req.query.category || req.session.category
+    // 全部選擇就等於是沒有選擇
+    if (selectedCategory === 'ALL') {
+      selectedCategory = ''
+    }
     if (selectedCategory) {
       const category = await Category.findOne({ name: selectedCategory })
       const categoryId = category._id
-      // 找出符合類型的record
+      // records (篩選)
       records = records.filter(record => record.categoryId.equals(categoryId))
     }
-
-    // 使用者 records (全部類型)
-    else {
-      records = await Record.find({ userId }).lean().sort({ _id: 'asc' })
-    }
-
-
+    req.session.category = selectedCategory // 存入session
 
     // 總金額
     let totalAmount = 0
@@ -134,6 +146,7 @@ router.get('/', async (req, res) => {
       totalAmountString,
       categories,
       selectedCategory,
+      sort,
     })
 
 

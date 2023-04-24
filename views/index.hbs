@@ -18,7 +18,7 @@
 
         <label class="input-group-text" for="category">帳目類型</label>
         <select class="form-control" id="category" name="category" id="category" onchange="this.form.submit()">
-          <option value="">全部</option>
+          <option value="ALL">全部</option>
 
           <!--有 selectCategory -->
           {{#if selectedCategory }}
@@ -50,10 +50,29 @@
       <h1 class="display-1 text-info">{{totalAmountString}}</h1>
     </div>
 
-    <!-- 新增按鈕 -->
+    <!-- sort -->
     <div class="d-flex justify-content-end">
-      <a href="/records/new" class="btn btn-primary mb-3">新增</a>
+      <form action="/records" method="get">
+        <select class="form-control" id="sort" name="sort" id="category" onchange="this.form.submit()"
+          style="width: 100px;">
+          <option value='' {{#if sort}}{{else}}selected{{/if}} disabled>排序方式</option>
+          <option value='_id-desc' {{#isSame sort '_id-desc' }} selected {{/isSame}}>最新建立</option>
+          <option value='date-desc' {{#isSame sort 'date-desc' }} selected {{/isSame}}>日期 - 最近</option>
+          <option value='date-asc' {{#isSame sort 'date-asc' }} selected {{/isSame}}>日期 - 最遠</option>
+          <option value='amount-desc' {{#isSame sort 'amount-desc' }} selected {{/isSame}}>金額 - 最高</option>
+          <option value='amount-asc' {{#isSame sort 'amount-asc' }} selected {{/isSame}}>金額 - 最低</option>
+        </select>
+      </form>
+
+      <!-- 新增按鈕 -->
+      <div class="d-flex justify-content-end ms-2">
+        <a href="/records/new" class="btn btn-primary mb-3">新增</a>
+      </div>
+
     </div>
+
+
+
 
     <!-- 項目list -->
     <ul class="list-group ">
