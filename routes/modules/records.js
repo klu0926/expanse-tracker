@@ -104,13 +104,12 @@ router.get('/', async (req, res) => {
 
       // ---------日期----------
       // 把獲取的日期字串再次做成 Data object
-      const dateString = record.date
-      const date = new Date(dateString)
+      const date = new Date(record.date)
 
       // 設定 options
       const options = { year: 'numeric', month: '2-digit', day: '2-digit' }
 
-      // 回傳當前environment 的時間
+      // 把日期整理成 year/month/date
       const localDateString = date.toLocaleDateString('zh-TW', options)
       record.localDateString = localDateString
     })
