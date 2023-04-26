@@ -53,7 +53,7 @@
     <!-- sort -->
     <div class="d-flex justify-content-end">
       <form action="/records" method="get">
-        <select class="form-control" id="sort" name="sort" id="category" onchange="this.form.submit()"
+        <select class="form-control" id="sort" name="sort" id="sort" onchange="this.form.submit()"
           style="width: 100px;">
           <option value='' {{#if sort}}{{else}}selected{{/if}} disabled>排序方式</option>
           <option value='_id-desc' {{#isSame sort '_id-desc' }} selected {{/isSame}}>最新建立</option>

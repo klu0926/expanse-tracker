@@ -2,7 +2,6 @@ const router = require('express').Router()
 const Record = require('../../models/Record')
 const Category = require('../../models/Category')
 
-
 // Create Page
 router.get('/new', async (req, res) => {
   const categories = await Category.find({}).lean()
@@ -11,7 +10,6 @@ router.get('/new', async (req, res) => {
 
 // Create Post
 router.post('/new', async (req, res) => {
-
   // 輸入的資料
   const data = req.body
 
@@ -24,17 +22,14 @@ router.post('/new', async (req, res) => {
   data.categoryId = referenceCategory._id
 
   // 做資料
-  const createdRecord = await Record.create(data)
+  await Record.create(data)
 
   // 做完回去 records
   res.redirect('/records')
 })
 
-
-
-// Read all 
+// Read all
 router.get('/', async (req, res) => {
-
   try {
     // 使用user Id (由passport 提供)
     const userId = req.user._id
@@ -58,7 +53,7 @@ router.get('/', async (req, res) => {
 
     // 沒有 records
     if (records.length === 0) {
-      let noRecords = true
+      const noRecords = true
       return res.render('index', { noRecords })
     }
 
@@ -83,11 +78,11 @@ router.get('/', async (req, res) => {
     const categories = await Category.find({}).lean()
 
     // 處理每一筆records
-    records.map((record) => {
-      //--------加入總金額----------
+    records.forEach((record) => {
+      // --------加入總金額----------
       totalAmount += record.amount
 
-      //--------獲得 類型icon---------
+      // --------獲得 類型icon---------
       // 也可以使用 equals() 來比較 mongoose ObjectId
       const matchCate = categories.find(cate => {
         return record.categoryId.toString() === cate._id.toString()
@@ -107,8 +102,7 @@ router.get('/', async (req, res) => {
       // 存入 class
       record.fontAwesomeClass = fontAwesomeClass
 
-
-      //---------日期----------
+      // ---------日期----------
       // 把獲取的日期字串再次做成 Data object
       const dateString = record.date
       const date = new Date(dateString)
@@ -122,7 +116,7 @@ router.get('/', async (req, res) => {
     })
 
     // 轉換成台幣，並拿掉小數點
-    const totalAmountString = totalAmount.toLocaleString('zh-TW', { style: 'currency', currency: 'TWD' }).split('.')[0];
+    const totalAmountString = totalAmount.toLocaleString('zh-TW', { style: 'currency', currency: 'TWD' }).split('.')[0]
 
     // 回傳 records
     res.render('index', {
@@ -130,16 +124,13 @@ router.get('/', async (req, res) => {
       totalAmountString,
       categories,
       selectedCategory,
-      sort,
+      sort
     })
-
-
   } catch (error) {
     res.locals.warning_msg = '出現預期外的問題，請您再嘗試一次。'
     console.log(error)
     return res.render('index')
   }
-
 })
 
 // Read One
@@ -168,7 +159,7 @@ router.get('/:id/edit', async (req, res) => {
     amount: record.amount,
     category: category.name,
     date,
-    categories,
+    categories
   })
 })
 
@@ -190,14 +181,12 @@ router.put('/:id', async (req, res) => {
     // 存入資料庫 後回去 /records
     await record.save()
     res.redirect('/records')
-
   } catch (error) {
     console.log(error)
     req.flash('warning_msg', '刪除資料出現預期外的問題，請您再嘗試一次。')
-    redirect(`/records/${recordId}/edit`)
+    res.redirect(`/records/${recordId}/edit`)
   }
 })
-
 
 // Delete
 router.delete('/:id', async (req, res) => {
@@ -211,13 +200,11 @@ router.delete('/:id', async (req, res) => {
 
     await record.deleteOne()
     return res.redirect('/records')
-
   } catch (error) {
     console.log(error)
     req.flash('warning_msg', error)
-    redirect('/records')
+    res.redirect('/records')
   }
-
 })
 
 module.exports = router

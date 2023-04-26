@@ -15,7 +15,6 @@ const USER_SEED = require('../seedsData/user.json').results
 USER_SEED[0].recordsList = [0, 1, 2, 4] // 廣志
 USER_SEED[1].recordsList = [3] // 小新
 
-
 db.once('open', async () => {
   console.log('starting recordSeeder...')
 

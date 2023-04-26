@@ -32,7 +32,7 @@ app.set('view engine', 'hbs')
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: true
 }))
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
@@ -46,7 +46,6 @@ app.use((req, res, next) => {
   res.locals.warning_msg = req.flash('warning_msg')
   next()
 })
-
 
 // routes
 app.use(routes)

@@ -4,7 +4,6 @@ const User = require('../../models/User')
 const bcrypt = require('bcryptjs')
 const { isNotAuthenticated } = require('../../middleware/auth')
 
-
 // 登入 GET
 router.get('/login', isNotAuthenticated, (req, res) => {
   res.render('login')
@@ -20,9 +19,8 @@ router.post('/login', (req, res, next) => {
   next()
 }, passport.authenticate('local', {
   successRedirect: '/records',
-  failureRedirect: '/user/login',
+  failureRedirect: '/user/login'
 }))
-
 
 // 註冊 GET
 router.get('/register', isNotAuthenticated, (req, res) => {
@@ -31,7 +29,6 @@ router.get('/register', isNotAuthenticated, (req, res) => {
 
 // 註冊 POST
 router.post('/register', async (req, res, next) => {
-
   let { name, email, password, confirmPassword } = req.body
   // 清理資訊
   name = name.trim()
@@ -42,7 +39,7 @@ router.post('/register', async (req, res, next) => {
     res.locals.warning_msg = '全部資訊都是必填的唷'
     return res.render('register', {
       name,
-      email,
+      email
     })
   }
 
@@ -51,10 +48,9 @@ router.post('/register', async (req, res, next) => {
     res.locals.warning_msg = '密碼兩次不一樣唷。'
     return res.render('register', {
       name,
-      email,
+      email
     })
   }
-
   try {
     // 檢查是email否已經有註冊
     const user = await User.findOne({ email })
@@ -62,7 +58,7 @@ router.post('/register', async (req, res, next) => {
       res.locals.warning_msg = '這信箱已經被註冊了。'
       return res.render('register', {
         name,
-        email,
+        email
       })
     }
 
@@ -84,15 +80,13 @@ router.post('/register', async (req, res, next) => {
       req.flash('success_msg', '註冊成功！')
       return res.redirect('/records')
     })
-
-  }
-  // 抓問題
-  catch (err) {
+  } catch (err) {
+    // 抓問題
     console.log(err)
     res.locals.warning_msg = '出現預期外的問題，請在嘗試一次'
     return res.render('register', {
       name,
-      email,
+      email
     })
   }
 })
@@ -101,7 +95,8 @@ router.post('/register', async (req, res, next) => {
 router.post('/logout', (req, res) => {
   req.logOut(error => {
     if (error) {
-      return next(error)
+      console.log(error)
+      return res.redirect('/')
     }
     req.flash('success_msg', '成功登出！')
     res.redirect('/user/login')

@@ -3,10 +3,8 @@ const LocalStrategy = require('passport-local')
 const FacebookStrategy = require('passport-facebook')
 const User = require('../models/User')
 const bcrypt = require('bcryptjs')
-const { disconnect } = require('mongoose')
 
 module.exports = (app) => {
-
   // 1 . passport init
   app.use(passport.initialize())
   app.use(passport.session())
@@ -17,7 +15,6 @@ module.exports = (app) => {
     passReqToCallback: true
 
   }, async (req, email, password, done) => {
-
     try {
       const user = await User.findOne({ email })
       // 檢查 email
@@ -33,7 +30,6 @@ module.exports = (app) => {
 
       // 通過，回傳使用者
       return done(null, user, req.flash('success_msg', '登入成功'))
-
     } catch (err) {
       console.log(err)
       return done(err, false)
@@ -85,7 +81,6 @@ passport.serializeUser((user, done) => {
 // 4 deserializeUser ( id => user)
 // 裡面放一個 callback 當他做完時會做什麼事情，這裡是拿回 user
 passport.deserializeUser((id, done) => {
-
   User.findById(id)
     .lean()
     .then(user => {
@@ -99,5 +94,3 @@ passport.deserializeUser((id, done) => {
       return done(error, null)
     })
 })
-
-

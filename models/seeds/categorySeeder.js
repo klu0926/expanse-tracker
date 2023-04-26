@@ -1,4 +1,3 @@
-const mongoose = require('mongoose')
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
@@ -7,7 +6,6 @@ if (process.env.NODE_ENV !== 'production') {
 const db = require('../../config/mongoose')
 const Category = require('../Category')
 const categoryData = require('../seedsData/category.json').results
-
 
 db.once('open', async () => {
   console.log('starting categorySeeder...')
@@ -18,8 +16,7 @@ db.once('open', async () => {
 
     process.exit()
     // Close the Mongoose connection explicitly
-    //await mongoose.disconnect();
-
+    // await mongoose.disconnect();
   } catch (error) {
     console.log(error)
   }

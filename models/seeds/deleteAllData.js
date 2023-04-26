@@ -9,7 +9,6 @@ const User = require('../User')
 const Category = require('../Category')
 
 db.once('open', async () => {
-
   try {
     console.log('deleting Record, User, Category data...')
 
@@ -24,8 +23,7 @@ db.once('open', async () => {
     // done
     console.log('all data deleted!')
     process.exit()
-  }
-  catch (err) {
+  } catch (err) {
     console.log(err)
   }
 })
