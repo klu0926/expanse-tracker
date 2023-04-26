@@ -91,7 +91,7 @@ npm run dev
 npm run seed
 ```
 
-* 刪除全部在資料庫內的餐廳與使用者資料
+* 刪除全部在資料庫內的資料,包含User, Category, Record的資料
 ```
 npm run deleteAllData
 ```
