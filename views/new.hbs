@@ -5,54 +5,48 @@
       <h1 class="text-center mt-3">新增支出</h1>
       {{> message}}
       <!-- form -->
-      <form action="/records/new" method="POST">
+      <form novalidate action="/records/new" method="POST" class="record-form">
 
         <!-- 支出名稱 -->
         <div class="mb-3">
           <label class="mb-2" for="name">項目名稱</label>
-          <input class="form-control" name="name" id="name" placeholder="Enter name" {{#if name}} value='{{name}}'
-            {{/if}}>
+          <input class="form-control" name="name" id="name" placeholder="10個字以內" maxlength="10" pattern="^\S+.*\S$" required>
+          <div class="valid-feedback">OK</div>
+          <div class="invalid-feedback">必須要填:10個字以內，開頭跟結尾不可以是空格</div>
         </div>
         <!-- 日期 -->
         <div class="mb-3">
           <label class="mb-2" for="date">日期</label>
-          <input class="form-control" type="date" name="date" id="date" {{#if date}}value="{{date}}" {{/if}}>
+          <input class="form-control" type="date" name="date" id="date" required>
+          <div class="valid-feedback">OK</div>
+          <div class="invalid-feedback">必須要填</div>
         </div>
         <!-- 類型 -->
         <div class="mb-3">
           <label class="mb-2" for="category">類型</label>
-          <select class="form-control" id="category" name="category" id="category">
+          <select class="form-control" id="category" name="category" id="category" required>
             <option value="">選擇類型</option>
-            <!-- 有選 category-->
-            {{#if category}}
-            {{#each categories}}
-            {{#with ../category}}
-            {{#isSame ../this.name .}}
-            <option value="{{../../this.name}}" selected>{{../../this.name}}</option>
-            {{else}}
-            <option value="{{../../this.name}}">{{../../this.name}}</option>
-            {{/isSame}}
-            {{/with}}
-            {{/each}}
-            <!-- 沒選 category-->
-            {{else}}
             {{#each categories}}
             <option value="{{this.name}}">{{this.name}}</option>
             {{/each}}
-            {{/if}}
           </select>
+          <div class="valid-feedback">OK</div>
+          <div class="invalid-feedback">必須要填</div>
         </div>
         <!-- 金額 -->
         <div class="mb-3">
           <label class="mb-2" for="amount">金額</label>
-          <input type="number" min="0" class="form-control" name="amount" id="amount" placeholder="Enter amount" {{#if
-            amount}} value='{{amount}}' {{/if}}>
+          <input type="number" min="0" max="100000000" class="form-control" name="amount" id="amount"
+            placeholder="Enter amount" required>
+          <div class="valid-feedback">OK</div>
+          <div class="invalid-feedback">必須要填: 0 ~ 1千萬以內</div>
         </div>
         <!--submit-->
-        <button type="submit" class="btn btn-primary mt-3" style="width: 100%;">新增</button>
+        <button type="submit" class="submit-btn btn btn-primary mt-3" style="width: 100%;">新增</button>
 
       </form>
-
     </div>
   </div>
 </div>
+
+<script src="/javascripts/validate.js"></script>

@@ -12,36 +12,20 @@ router.get('/new', async (req, res) => {
 // Create Post
 router.post('/new', async (req, res) => {
 
-  const { name, date, category, amount } = req.body
+  // 輸入的資料
+  const data = req.body
+
+  // 取得Category資料，對比獲取對應的category
   const categories = await Category.find({}).lean()
+  const referenceCategory = categories.find(cate => cate.name === data.category)
 
-  // input guard
-  if (!name || !date || !category || !amount) {
-    res.locals.warning_msg = '每個項目都是必須填的唷。'
-    return res.render('new', {
-      name,
-      date,
-      category,
-      amount,
-      categories
-    })
-  }
-
-  // 取得 user id
-  const userId = req.user._id
-
-  // 取得 categories id
-  const referenceCategory = categories.find(cate => cate.name === category)
-  const categoryId = referenceCategory._id
+  // 給予資料 userID & categoryId
+  data.userId = req.user._id
+  data.categoryId = referenceCategory._id
 
   // 做資料
-  await Record.create({
-    name,
-    date,
-    amount,
-    userId,
-    categoryId
-  })
+  const createdRecord = await Record.create(data)
+
   // 做完回去 records
   res.redirect('/records')
 })
@@ -75,7 +59,7 @@ router.get('/', async (req, res) => {
     // 沒有 records
     if (records.length === 0) {
       let noRecords = true
-      return res.render('index', { noRecords: true })
+      return res.render('index', { noRecords })
     }
 
     // 篩選類型
@@ -175,57 +159,34 @@ router.get('/:id/edit', async (req, res) => {
   const categories = await Category.find({}).lean()
   const category = categories.find(cate => cate._id.toString() === record.categoryId.toString())
 
-  // convert date to year.month.day formate
+  // convert date to year.month.day format
   const date = record.date.toISOString().slice(0, 10)
 
   res.render('edit', {
-    categories,
     id: record._id,
-    category: category.name,
     name: record.name,
     amount: record.amount,
+    category: category.name,
     date,
+    categories,
   })
 })
 
 // Update put
 router.put('/:id', async (req, res) => {
-  const id = req.params.id
+  const recordId = req.params.id
   const updateData = req.body
-  let { name, date, category, amount } = req.body
 
   try {
-    // get category
-    const categories = await Category.find({}).lean()
-
-    // 檢查必要資料，有少就提示
-    name = name.trim()
-    if (!name || !category || !date || !amount) {
-
-      res.locals.warning_msg = '所有的資料都是必填的唷。'
-      return res.render('edit', {
-        categories,
-        id,
-        category,
-        name,
-        amount,
-        date,
-      })
-    }
-
-    // get record
-    const record = await Record.findById(id)
-
     // get categoryId
-    const currentCategory = categories.find(cate => cate.name === category)
+    const categories = await Category.find({}).lean()
+    const currentCategory = categories.find(cate => cate.name === updateData.category)
     updateData.categoryId = currentCategory._id
 
     // update data
-    for (const key in updateData) {
-      if (key in record) {
-        record[key] = updateData[key]
-      }
-    }
+    let record = await Record.findById(recordId)
+    record = Object.assign(record, updateData)
+
     // 存入資料庫 後回去 /records
     await record.save()
     res.redirect('/records')
@@ -233,7 +194,7 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     console.log(error)
     req.flash('warning_msg', '刪除資料出現預期外的問題，請您再嘗試一次。')
-    redirect(`/records/${id}/edit`)
+    redirect(`/records/${recordId}/edit`)
   }
 })
 
@@ -244,14 +205,16 @@ router.delete('/:id', async (req, res) => {
 
   try {
     const record = await Record.findById(id)
-    if (record) {
-      await record.deleteOne()
-    }
+
+    // no record guard
+    if (!record) throw new Error('出現問題，找不到資料。')
+
+    await record.deleteOne()
     return res.redirect('/records')
 
-  } catch (err) {
-    console.log(err)
-    req.flash('warning_msg', '刪除資料出現預期外的問題，請您再嘗試一次。')
+  } catch (error) {
+    console.log(error)
+    req.flash('warning_msg', error)
     redirect('/records')
   }
 
