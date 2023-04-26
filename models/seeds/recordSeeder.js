@@ -10,68 +10,63 @@ const bcrypt = require('bcryptjs')
 const Category = require('../Category')
 
 // 種子使用者
-const userData = require('../seedsData/user.json').results
-const users = [] // 廣志，小新
-const user1RecordsIndex = [0, 1, 2, 4] // start from 0
-const user2RecordsIndex = [3]
+const USER_SEED = require('../seedsData/user.json').results
+// 設定使用者的 Record index
+USER_SEED[0].recordsList = [0, 1, 2, 4] // 廣志
+USER_SEED[1].recordsList = [3] // 小新
+
 
 db.once('open', async () => {
   console.log('starting recordSeeder...')
-  console.log('creating seed users...')
 
-  try {
-    // create user data
-    await Promise.all(
-      userData.map(async (seedUser) => {
+  // 取得類別資料
+  const categoryData = await Category.find({})
+  console.log('category data found.')
+
+  // 做使用者資料，跟做用者的Record
+  console.log('creating seed users and records...')
+  return Promise.all(
+    // 有幾個使用者就做幾次
+    USER_SEED.map(async (user) => {
+      try {
+        // 做出一個使用者
         const salt = await bcrypt.genSalt(10)
-        const hash = await bcrypt.hash(seedUser.password, salt)
-        const user = await User.create({
-          name: seedUser.name,
-          email: seedUser.email,
+        const hash = await bcrypt.hash(user.password, salt)
+        const createdUser = await User.create({
+          name: user.name,
+          email: user.email,
           password: hash
         })
-        console.log(`User ${user.name} created successfully.`)
-        users.push(user)
-      })
-    )
-    console.log('users created!')
-    // ------------------------------
-    // get category data (用來獲得每樣類性的_id)
-    const categoryDataList = await Category.find().lean()
+        console.log(`user ${createdUser.name} created!`)
 
-    // create record data
-    await Promise.all(
-      recordData.map(async (seedRecord, index) => {
+        // 找出 user 全部的 records
+        const userRecords = user.recordsList.map(index => {
+          const record = recordData[index]
+          // record 的 userId
+          record.userId = createdUser._id
 
-        const { name, date, amount, category } = seedRecord
-
-        // set record's categoryId
-        const referenceCategory = categoryDataList.find(data => data.name === category)
-        seedRecord.categoryId = referenceCategory._id
-
-        // set record's userId
-        if (user1RecordsIndex.includes(index)) {
-          seedRecord.userId = users[0]._id
-        }
-        if (user2RecordsIndex.includes(index)) {
-          seedRecord.userId = users[1]._id
-        }
-
-        // create record
-        await Record.create({
-          name,
-          date,
-          amount,
-          userId: seedRecord.userId,
-          categoryId: seedRecord.categoryId,
+          // record 的 categoryId
+          const referenceCategory = categoryData.find(data => {
+            return data.name === record.category
+          })
+          record.categoryId = referenceCategory._id
+          // 回傳 record
+          return record
         })
-      })
-    )
-    // done
-    console.log('all done!')
-    process.exit()
 
-  } catch (error) {
-    console.log(error)
-  }
+        // 製作 user Records
+        await Record.create(userRecords)
+        console.log(`${user.name}'s ${user.recordsList.length} records created!`)
+      } catch (err) {
+        console.log(err)
+      }
+    })
+  )
+    .then(() => {
+      console.log('all users and records created!')
+      process.exit()
+    })
+    .catch(err => {
+      console.log(err)
+    })
 })
