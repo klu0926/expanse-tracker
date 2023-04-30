@@ -19,7 +19,6 @@
         <label class="input-group-text" for="category">帳目類型</label>
         <select class="form-control" id="category" name="category" id="category" onchange="this.form.submit()">
           <option value="ALL">全部</option>
-
           <!--有 selectCategory -->
           {{#if selectedCategory }}
           {{#each categories as | cate |}}
@@ -49,6 +48,8 @@
     <div class="d-flex justify-content-center">
       <h1 class="display-1 text-info">{{totalAmountString}}</h1>
     </div>
+    <!--chart-->
+    {{>chart}}
 
     <!-- sort -->
     <div class="d-flex justify-content-end">
