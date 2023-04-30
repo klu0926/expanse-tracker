@@ -2,6 +2,9 @@ const ctx = document.getElementById('myChart');
 
 // get data from server (先得到全部資料，之後再依照sort來改變資料顯示)
 (async function () {
+
+  if (!ctx) return
+
   try {
     // get user records data
     const recordsResponse = await fetch('/data/records')
@@ -86,5 +89,3 @@ const ctx = document.getElementById('myChart');
   }
 
 })()
-
-
