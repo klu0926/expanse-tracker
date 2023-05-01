@@ -57,7 +57,7 @@ const ctx = document.getElementById('myChart');
         datasets: [{
           label: '$',
           data: Array.from(data, cate => cate.total),
-          borderWidth: 1,
+          borderWidth: 3,
         }]
       },
       options: {
@@ -79,10 +79,34 @@ const ctx = document.getElementById('myChart');
                 return label + " : " + total;
               }
             },
-          }
+          },
+          // 這需要使用 chart.js-plugin-labels外掛使用，script在 view/layout/main.hbs
+          labels: {
+            render: 'percentage',
+            fontSize: 16,
+            fontStyle: 'bold',
+            fontColor: 'white',
+            precision: 1,
+            position: 'border',
+            showZero: false,
+            render: function (args) {
+              // args will be something like:
+              // { label: 'Label', value: 123, percentage: 50, index: 0, dataset: {...} }
+              // 在上面把 value 0 設定為 -1 了，所以這邊檢查 -1
+              if (args.value === -1) {
+                return ''
+              } else {
+                return args.percentage + '%';
+              }
+              // return object if it is image
+              // return { src: 'image.png', width: 16, height: 16 };
+            },
+          },
         }
       }
     });
+
+
 
   } catch (err) {
     console.log(err)
